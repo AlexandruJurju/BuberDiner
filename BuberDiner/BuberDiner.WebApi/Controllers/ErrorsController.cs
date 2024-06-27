@@ -8,7 +8,7 @@ public class ErrorsController : ControllerBase
     [HttpGet("error")]
     public IActionResult Error()
     {
-        Exception exception = HttpContext.Features.Get<IExceptionHandlerFeature>()!.Error;
+        var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()!.Error;
 
         return Problem(title: exception.Message);
     }

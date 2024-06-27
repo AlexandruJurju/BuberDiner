@@ -10,8 +10,8 @@ namespace BuberDiner.WebApi.Errors;
 
 public class BuberDinerProblemDetailsFactory : ProblemDetailsFactory
 {
-    private readonly ApiBehaviorOptions _options;
     private readonly Action<ProblemDetailsContext>? _configure;
+    private readonly ApiBehaviorOptions _options;
 
     public BuberDinerProblemDetailsFactory(
         IOptions<ApiBehaviorOptions> options,
@@ -37,7 +37,7 @@ public class BuberDinerProblemDetailsFactory : ProblemDetailsFactory
             Title = title,
             Type = type,
             Detail = detail,
-            Instance = instance,
+            Instance = instance
         };
 
         ApplyProblemDetailsDefaults(httpContext, problemDetails, statusCode.Value);
@@ -63,14 +63,12 @@ public class BuberDinerProblemDetailsFactory : ProblemDetailsFactory
             Status = statusCode,
             Type = type,
             Detail = detail,
-            Instance = instance,
+            Instance = instance
         };
 
         if (title != null)
-        {
             // For validation problem details, don't overwrite the default title with null.
             problemDetails.Title = title;
-        }
 
         ApplyProblemDetailsDefaults(httpContext, problemDetails, statusCode.Value);
 
@@ -88,18 +86,12 @@ public class BuberDinerProblemDetailsFactory : ProblemDetailsFactory
         }
 
         var traceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier;
-        if (traceId != null)
-        {
-            problemDetails.Extensions["traceId"] = traceId;
-        }
+        if (traceId != null) problemDetails.Extensions["traceId"] = traceId;
 
         var errors = httpContext?.Items[HttpContextItemKeys.Errors] as List<Error>;
 
-        if (errors is not null)
-        {
-            problemDetails.Extensions.Add("errorCodes", errors.Select(e => e.Code));
-        }
+        if (errors is not null) problemDetails.Extensions.Add("errorCodes", errors.Select(e => e.Code));
 
-        _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
+        _configure?.Invoke(new ProblemDetailsContext { HttpContext = httpContext!, ProblemDetails = problemDetails });
     }
 }
