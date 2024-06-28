@@ -2,6 +2,8 @@
 using BuberDiner.Application.Authentication.Common;
 using BuberDiner.Application.Authentication.Queries.Login;
 using BuberDiner.Contracts.Authentication;
+using ErrorOr;
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,50 +13,39 @@ namespace BuberDiner.WebApi.Controllers;
 public class AuthenticationController : ApiController
 {
     private readonly ISender _mediator;
+    private readonly IMapper _mapper;
 
-    public AuthenticationController(ISender mediator)
+    public AuthenticationController(ISender mediator, IMapper mapper)
     {
         _mediator = mediator;
+        _mapper = mapper;
     }
 
     [HttpPost("register")]
     [ProducesResponseType(200, Type = typeof(AuthenticationResponse))]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
+        var command = _mapper.Map<RegisterCommand>(request);
 
-        var authResult = await _mediator.Send(command);
+        var registerResult = await _mediator.Send(command);
 
-        return authResult.Match(
-            resultValue => Ok(MapAuthResult(resultValue)),
-            errors => Problem(errors));
-    }
-
-    private AuthenticationResponse MapAuthResult(AuthenticationResult authResult)
-    {
-        var response = new AuthenticationResponse(
-            authResult.User.Id,
-            authResult.User.FirstName,
-            authResult.User.LastName,
-            authResult.User.Email,
-            authResult.Token
-        );
-
-        return response;
+        return registerResult.Match(
+            authResult => Ok(_mapper.Map<AuthenticationResponse>(authResult)),
+            Problem);
     }
 
     [HttpPost("login")]
     [ProducesResponseType(200, Type = typeof(AuthenticationResponse))]
-    public async Task<IActionResult> Login(LoginRequest loginRequest)
+    public async Task<IActionResult> Login(LoginRequest request)
     {
-        var query = new LoginQuery(loginRequest.Email, loginRequest.Password);
-        var loginResult = await _mediator.Send(query);
+        var query = _mapper.Map<LoginQuery>(request);
+        ErrorOr<AuthenticationResult> loginResult = await _mediator.Send(query);
 
         if (loginResult.IsError && loginResult.FirstError == Domain.Common.Errors.Errors.Authentication.InvalidCredentials)
             return Problem(statusCode: StatusCodes.Status401Unauthorized, title: loginResult.FirstError.Description);
 
         return loginResult.Match(
-            resultValue => Ok(MapAuthResult(resultValue)),
-            errors => Problem(errors));
+            authResult => Ok(_mapper.Map<AuthenticationResponse>(authResult)),
+            Problem);
     }
 }

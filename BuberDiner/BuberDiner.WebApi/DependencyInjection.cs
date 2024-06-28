@@ -1,12 +1,35 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using System.Reflection;
+using BuberDiner.WebApi.Common.Errors;
+using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.OpenApi.Models;
 
 namespace BuberDiner.WebApi;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddWebApi(this IServiceCollection services)
+    public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+        services.AddControllers();
+        
+        services.AddSingleton<ProblemDetailsFactory, BuberDinerProblemDetailsFactory>();
+        
         services.AddSwaggerDoc();
+        services.AddMappings();
+        return services;
+    }
+
+    private static IServiceCollection AddMappings(this IServiceCollection services)
+    {
+        var config = TypeAdapterConfig.GlobalSettings;
+        config.Scan(Assembly.GetExecutingAssembly());
+
+        services.AddSingleton(config);
+        services.AddScoped<IMapper, ServiceMapper>();
+
         return services;
     }
 

@@ -1,4 +1,4 @@
-﻿using BuberDiner.WebApi.Http;
+﻿using BuberDiner.WebApi.Common.Http;
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 
