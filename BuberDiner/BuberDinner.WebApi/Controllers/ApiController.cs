@@ -11,15 +11,9 @@ public class ApiController : ControllerBase
     [HttpGet("problem")]
     protected IActionResult Problem(List<Error> errors)
     {
-        if (errors.Count == 0)
-        {
-            return Problem();
-        }
+        if (errors.Count == 0) return Problem();
 
-        if (errors.All(error => error.Type == ErrorType.Validation))
-        {
-            return ValidationProblem(errors);
-        }
+        if (errors.All(error => error.Type == ErrorType.Validation)) return ValidationProblem(errors);
 
         HttpContext.Items[HttpContextItemKeys.Errors] = errors;
 
@@ -44,11 +38,9 @@ public class ApiController : ControllerBase
         var modelStateDictionary = new ModelStateDictionary();
 
         foreach (var error in errors)
-        {
             modelStateDictionary.AddModelError(
                 error.Code,
                 error.Description);
-        }
 
         return ValidationProblem(modelStateDictionary);
     }
