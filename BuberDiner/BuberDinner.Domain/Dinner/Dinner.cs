@@ -96,4 +96,10 @@ public sealed class Dinner : AggregateRoot<DinnerId>
             DateTime.UtcNow,
             DateTime.UtcNow);
     }
+
+#pragma warning disable CS8618
+    private Dinner()
+    {
+    }
+#pragma warning restore CS8618
 }

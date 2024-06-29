@@ -25,4 +25,8 @@ public sealed class UserId : ValueObject
     {
         yield return Value;
     }
+
+    private UserId()
+    {
+    }
 }

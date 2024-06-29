@@ -2,22 +2,30 @@ using BuberDinner.Domain.Common.Models;
 
 namespace BuberDinner.Domain.Menu.ValueObjects;
 
-public class MenuItemId : ValueObject
+public sealed class MenuItemId : ValueObject
 {
+    public Guid Value { get; }
+
     private MenuItemId(Guid value)
     {
         Value = value;
     }
 
-    public Guid Value { get; }
-
     public static MenuItemId CreateUnique()
     {
-        return new MenuItemId(Guid.NewGuid());
+        return new(Guid.NewGuid());
     }
+
+    public static MenuItemId Create(Guid value)
+    {
+        return new(value);
+    }
+
 
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
     }
+    private MenuItemId() { }
+
 }

@@ -9,7 +9,7 @@ public sealed class ReservationId : ValueObject
         Value = value;
     }
 
-    public Guid Value { get; }
+    public Guid Value { get; private set; }
 
     public static ReservationId CreateUnique()
     {
@@ -19,5 +19,9 @@ public sealed class ReservationId : ValueObject
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
+    }
+
+    public ReservationId()
+    {
     }
 }

@@ -16,10 +16,10 @@ public sealed class Location : ValueObject
         Longitude = longitude;
     }
 
-    public string Name { get; }
-    public string Description { get; }
-    public double Latitude { get; }
-    public double Longitude { get; }
+    public string Name { get; private set; }
+    public string Description { get; private set; }
+    public double Latitude { get; private set; }
+    public double Longitude { get; private set; }
 
     public static Location CreateNew(
         string name,
@@ -40,5 +40,9 @@ public sealed class Location : ValueObject
         yield return Description;
         yield return Latitude;
         yield return Longitude;
+    }
+
+    public Location()
+    {
     }
 }

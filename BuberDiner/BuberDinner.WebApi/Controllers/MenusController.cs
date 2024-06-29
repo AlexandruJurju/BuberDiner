@@ -1,7 +1,5 @@
 using BuberDinner.Application.Menus.Commands.CreateMenu;
 using BuberDinner.Contracts.Menus;
-using BuberDinner.Domain.Menu;
-using ErrorOr;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +9,8 @@ namespace BuberDinner.WebApi.Controllers;
 [Route("menus")]
 public class MenusController : ApiController
 {
-    private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly IMediator _mediator;
 
     public MenusController(IMediator mediator, IMapper mapper)
     {
@@ -26,10 +24,8 @@ public class MenusController : ApiController
     {
         var command = _mapper.Map<CreateMenuCommand>((request, hostId));
 
-        Console.WriteLine(command);
-
         var createMenuResult = await _mediator.Send(command);
-        
+
         return createMenuResult.Match(
             menu => Ok(_mapper.Map<MenuResponse>(menu)),
             errors => Problem(errors));

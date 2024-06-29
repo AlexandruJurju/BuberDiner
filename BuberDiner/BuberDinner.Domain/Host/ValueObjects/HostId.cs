@@ -25,4 +25,8 @@ public sealed class HostId : ValueObject
     {
         return new HostId(value);
     }
+
+    private HostId()
+    {
+    }
 }
